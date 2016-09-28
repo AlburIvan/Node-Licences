@@ -3,6 +3,7 @@ module.exports = (function() {
 
 	var routes = require('express').Router();
 	var path = require('path');
+	var googleapis = require('googleapis');
 
 	routes.get('/', function(req,res) {
 		res.sendFile(path.resolve('./public/index.html'));
@@ -14,7 +15,7 @@ module.exports = (function() {
 		try {
 
 			var fs = require('fs');
-			fs.readFile('D:\\Projects\\Java\\android_workspace\\USSDNotifier\\app\\build.gradle', 'utf8', function (err, data) {
+			fs.readFile('D:\\Trabajos\\Java\\Raworks\\SuperFavorito\\app\\build.gradle', 'utf8', function (err, data) {
 				if (err) {
 					return console.log(err);
 				}
@@ -22,9 +23,28 @@ module.exports = (function() {
 				let indexOfDependenciesStart = data.indexOf('dependencies {');
 				let indexOfDependenciesEnd = data.length;
 
-				console.log(data.substring(indexOfDependenciesStart, indexOfDependenciesEnd));	
 
-				res.send(data);
+				let dependencies = data.substring(indexOfDependenciesStart, indexOfDependenciesEnd);
+
+
+				// compiles
+				let singleDependencies = dependencies.split('compile');
+
+				for (var i = 0; i < singleDependencies.length; i++) {
+					console.log(singleDependencies[i]);
+
+
+					googleapis.discover(singleDependencies[i], 'v1').execute(function(err, client) {
+					  // set api key
+					  client.withApiKey('...');
+					  client.search.cse.list({ q: '...' }).execute(console.log);
+					});
+				}
+
+
+
+
+				res.send(dependencies);
 			});
 		}
 		catch(e)
